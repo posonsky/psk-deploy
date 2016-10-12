@@ -1,0 +1,19 @@
+---
+quick: false
+
+sites_home: /opt/sites
+pves_home: /opt/pves
+static_home: /opr/static
+
+web_app_user: '{{ ansible_user_id }}'
+web_app_user_home: '{{ ansible_env.HOME }}'
+
+backend_project: 'cpz'
+target_python_version: '3.4'
+project_pve: '{{ pves_home }}/{{ backend_project }}-{{ target_python_version }}'
+
+backend_git_remote: '/repos/cpz.git'
+backend_project_dir: '{{ sites_home }}/{{ backend_project }}'
+backend_static_dir: '{{ static_home }}/{{ backend_project }}'
+
+logs_home: '{{ sites_home }}/logs'

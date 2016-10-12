@@ -7,6 +7,6 @@ group_vars/*
 host_vars/*
 keys/*
 log/*
-vars/*
+#vars/*
 
 !*/.gitkeep

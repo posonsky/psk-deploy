@@ -1,0 +1,18 @@
+- name: Testing playbook
+  hosts: '{{ target }}'
+  # gather_facts: no
+  vars_files:
+    - ../vars/common.yaml
+  vars:
+    mega_option: Bla-bla-bla
+    ctx: '{{ mega_option }} - {{ ansible_distribution }}'
+
+
+  tasks:
+    - name: Create a file
+      copy: content={{ ctx }}  dest=/tmp/dummy.txt
+      tags: super
+
+    - name: Test message
+      debug: msg='System {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}'
+      tags: dummy
