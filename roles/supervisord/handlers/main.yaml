@@ -1,0 +1,5 @@
+---
+- name: restart supervisord
+  become: yes
+  become_user: root
+  service: name=supervisord state=restarted enabled=yes

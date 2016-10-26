@@ -1,0 +1,26 @@
+---
+- block:
+  - name: ensure supervisor in package.keywords
+    lineinfile:
+      dest: /etc/portage/package.keywords
+      line: app-admin/supervisor
+      create: yes
+
+  - name: install supervisor package
+    portage: package=app-admin/supervisor state=present update=yes quiet=yes
+    register: supervisor_installed
+
+  - name: create directory for projects settings controls by supervisor
+    file: path={{ supervisor_include_dir }} state=directory
+    when: supervisor_installed.changed
+
+  - name: make supervisor main configuration file
+    template: src=supervisord.conf dest=/etc/supervisord.conf
+    notify: restart supervisord
+    when: supervisor_installed.changed
+
+  - name: ensure nginx running
+    service: name=supervisord state=started enabled=yes
+    when: not supervisor_installed.changed
+
+  become: yes

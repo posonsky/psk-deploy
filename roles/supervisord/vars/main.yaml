@@ -1,0 +1,2 @@
+---
+supervisor_include_dir: '/etc/supervisor/conf.d'
