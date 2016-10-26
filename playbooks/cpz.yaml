@@ -1,0 +1,14 @@
+---
+- name: install CPZ web-application infrastructure
+  hosts: '{{ target }}'
+  gather_facts: no
+  vars_files:
+    - ../vars/common.yaml
+    - ../vars/cpz.yaml
+
+  roles:
+    - { role: python3, tags: [backend] }
+
+#    - { role: mcms_backend, tags: [backend] }
+#    - { role: mcms_ansible, tags: [ansible] }
+#    - { role: mcms_frontend, tags: [frontend] }
