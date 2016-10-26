@@ -1,0 +1,39 @@
+---
+- block:
+  - name: ensure nginx in package.keywords
+    lineinfile:
+      dest: /etc/portage/package.keywords
+      line: www-servers/nginx
+      create: yes
+
+  - name: ensure nginx package installed
+    portage: package=nginx state=present update=yes quiet=yes
+    register: nginx_installed
+
+  - name: create directory structure for vitual hosts
+    file: path=/etc/nginx/{{ item }} state=directory
+    with_items:
+      - 'sites-available'
+      - 'sites-enabled'
+    when: nginx_installed.changed
+
+  - name: create home directory for web projects
+    file: path={{ sites_home }} state=directory
+    when: nginx_installed.changed
+
+  - name: create directory structure for nginx
+    file: path={{ nginx_home }}/{{ item }} state=directory owner=nginx group=nginx
+    with_items:
+      - 'cache'
+    when: nginx_installed.changed
+
+  - name: make nginx main configuration file
+    template: src=nginx.conf dest=/etc/nginx/nginx.conf
+    when: nginx_installed.changed
+    notify: restart nginx
+
+  - name: ensure nginx running
+    service: name=nginx state=started enabled=yes
+    when: not nginx_installed.changed
+
+  become: yes

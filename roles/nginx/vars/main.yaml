@@ -1,0 +1,2 @@
+---
+nginx_home: "{{ sites_home }}/nginx"
