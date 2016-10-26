@@ -1,0 +1,6 @@
+---
+gentoo_packages:
+  - 'dev-lang/python:{{ target_python_version }}'
+  - dev-python/virtualenv
+  - dev-python/virtualenvwrapper
+  - dev-vcs/git

@@ -1,0 +1,13 @@
+---
+- block:
+  - name: ensure necessery keyword addition
+    lineinfile:
+      dest: /etc/portage/package.keywords
+      line: dev-python/virtualenvwrapper
+      create: yes
+
+  - name: ensure python3 runtime enveronment available
+    portage: package={{ item }} state=present quiet=yes
+    with_items: '{{ gentoo_packages }}'
+
+  become: yes
