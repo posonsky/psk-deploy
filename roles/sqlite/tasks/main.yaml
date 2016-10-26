@@ -1,0 +1,5 @@
+---
+- name: ensure sqlite package installed
+  become: yes
+  become_user: root
+  portage: package=dev-db/sqlite:3 state=present quiet=yes
