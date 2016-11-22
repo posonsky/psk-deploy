@@ -4,10 +4,18 @@
     lineinfile:
       dest: /etc/portage/package.keywords
       line: dev-python/virtualenvwrapper
+      state: present
+      create: yes
+
+  - name: ensure sqlite in python3 USE variables
+    lineinfile:
+      dest: /etc/portage/package.use/python3
+      line: dev-lang/python  sqlite
+      state: present
       create: yes
 
   - name: ensure python3 runtime enveronment available
-    portage: package={{ item }} state=present quiet=yes
+    portage: package={{ item }} state=installed changed_use=yes quiet=yes
     with_items: '{{ gentoo_packages }}'
 
   become: yes
