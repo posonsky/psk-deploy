@@ -15,9 +15,9 @@
     when: supervisor_installed.changed
 
   - name: make supervisor main configuration file
-    template: src=supervisord.conf dest=/etc/supervisord.conf
+    template: src=supervisord.conf.j2 dest=/etc/supervisord.conf
     notify: restart supervisord
-    when: supervisor_installed.changed
+    # when: supervisor_installed.changed
 
   - name: ensure nginx running
     service: name=supervisord state=started enabled=yes
