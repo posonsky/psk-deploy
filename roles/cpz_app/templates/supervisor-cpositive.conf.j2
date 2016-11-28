@@ -1,0 +1,21 @@
+[program:cpz_gunicorn]
+command={{ project_pve }}/bin/gunicorn cpz.wsgi:application
+  -b unix://{{ cpz_backend_socket }}
+
+#--yaml {{ backend_project_dir }}/uwsgi.yaml
+
+environment=
+  DJANGO_SETTINGS_MODULE="{{ django_settings_module }}",
+  SECRET_KEY="123"
+
+user={{ web_app_user }}
+directory={{ backend_project_dir }}
+autostart=true
+autorestart=true
+
+
+[group:cpz]
+# programs = cpz_worker,cpz_beat,cpz_uwsgi
+programs = cpz_gunicorn
+startretries = 2
+user = {{ web_app_user }}

@@ -1,0 +1,6 @@
+- name: prepare base environment
+  include: environment.yaml
+  when: 'not quick'
+
+- name: deploy backend project
+  include: backend.yaml

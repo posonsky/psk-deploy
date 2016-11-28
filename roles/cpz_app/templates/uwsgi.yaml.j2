@@ -1,0 +1,11 @@
+---
+uwsgi:
+  socket: {{ cpz_backend_socket }}
+  chmod-socket: 666
+  chdir: {{ backend_project_dir }}
+  master: true
+  processes: 4
+  virtualenv: {{ project_pve }}
+  wsgi-file: project/wsgi.py
+  vacuum: true
+  logger: file:{{ logs_home }}/uwsgi.log

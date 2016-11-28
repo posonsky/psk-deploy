@@ -1,0 +1,24 @@
+---
+backend_git_remote: '/repos/cpz.git'
+backend_git_branch: master
+
+backend_project_dir: '{{ sites_home }}/{{ backend_project }}'
+backend_static_dir: '{{ static_home }}/{{ backend_project }}'
+
+cpz_backend_socket: /tmp/cpz_backend.sock
+
+cpz_http_hostname: cpositive.ru
+cpz_http_port: 80
+
+db_name: cpz
+
+django_settings_module: 'cpz.settings.production'
+django_settings_path: 'cpz/settings/production.py'
+
+main_worker_concurrency: 4
+
+project_pve: '{{ pves_home }}/{{ backend_project }}-{{ target_python_version }}'
+
+web_app_user: '{{ backend_project }}_runner'
+web_app_group: 'wapp'
+web_app_user_home: '{{ backend_project_dir }}'

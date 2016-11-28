@@ -1,0 +1,121 @@
+- name: setup variables to prevent the fail
+  set_fact:
+    django_settings: { 'changed': false }
+    uwsgi_config: { 'changed': false }
+    superviosor_config: { 'changed': false }
+  tags:
+    - fast
+
+- name: create/update PVE for project
+  pip: virtualenv='{{ project_pve }}' state=latest name={{ item }}
+  with_items:
+    - 'pip'
+    - 'setuptools'
+    - 'wheel'
+  register: pve_created
+
+- name: clone/pull backend project from git
+  git:
+    repo: '{{ backend_git_remote }}'
+    dest: '{{ backend_project_dir }}'
+    version: '{{ backend_git_branch }}'
+    update: yes
+  tags:
+    - fast
+  register: src_updated
+
+- name: print out git pull result
+  debug: var=src_updated verbosity=2
+  tags:
+   - fast
+
+- name: setup/update project requirements
+  pip:
+    requirements: '{{ backend_project_dir }}/cpz/requirements/production.txt'
+    virtualenv: '{{ project_pve }}'
+  register: pve_updated
+  when: src_updated.changed or pve_created
+  tags:
+    - fast
+
+- block:
+  - name: make production Django settings
+    template: src=production.py.j2
+        dest='{{ backend_project_dir }}/{{ django_settings_path }}'
+        owner={{ web_app_user }} group='{{ web_app_group }}' mode=0444
+    register: django_settings
+
+# - name: put uwsgi config
+#   template: src=templates/uwsgi.yaml.j2
+#       dest='{{ backend_project_dir }}/uwsgi.yaml'
+#       owner={{ web_app_user }} group='{{ web_app_group }}' mode=0640
+#   register: uwsgi_config
+
+#- name: put gunicorn config
+#  template: src=templates/uwsgi.yaml.j2
+
+  - name: put supervisor's config
+    template: src=supervisor-cpositive.conf.j2
+        dest=/etc/supervisor/conf.d/cpositive.conf
+        owner=root group=root mode=0640
+    register: superviosor_config
+
+  - name: put nginx vhost config
+    template: src=vhost-cpositive.conf.j2
+        dest=/etc/nginx/sites-available/cpositive.conf
+        owner=root group=root mode=0644
+    register: vhost_config
+
+  - name: create link in sites-enabled
+    file: src=/etc/nginx/sites-available/cpositive.conf
+        dest=/etc/nginx/sites-enabled/cpositive.conf state=link
+    when: vhost_config.changed
+
+  become: yes
+
+- name: set write permission on Django log for deployment user
+  file: path='{{ logs_home }}/django.log' owner='{{ deploy_user }}'
+      group='{{ web_app_group }}' mode=0660 state=file
+  become: yes
+
+- block:
+  - name: run django migrations
+    django_manage: command=migrate app_path='{{ backend_project_dir }}'
+        settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
+    when: src_updated.changed
+    tags:
+      - fast
+
+  # - name: load fixtures
+  #   django_manage: command=loaddata app_path='{{ backend_project_dir }}'
+  #       settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
+  #       fixtures='initial'
+
+  - name: collect backend static
+    django_manage: command=collectstatic app_path='{{ backend_project_dir }}'
+        settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
+    when: pve_updated.changed
+    tags:
+      - fast
+
+  environment:
+    SECRET_KEY: '{{ django_secret_key }}'
+
+- block:
+  - name: ensure supervisor's running
+    service: name=supervisord state=started enabled=yes
+    register: superviosor_running
+
+  - name: restart services
+    supervisorctl: name='cpz:' state=restarted
+    when: src_updated.changed or pve_updated.changed
+        or django_settings.changed or uwsgi_config.changed
+        or superviosor_config.changed
+    tags:
+      - fast
+
+  - name: apply vhost settings to nginx instance
+    service: name=nginx state=reloaded enabled=yes
+    when: vhost_config.changed
+
+  become: yes
