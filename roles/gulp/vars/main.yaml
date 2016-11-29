@@ -1,0 +1,4 @@
+---
+strings_in_keywords:
+  - net-libs/nodejs
+  - =dev-libs/libuv-1.10.0 ~amd64

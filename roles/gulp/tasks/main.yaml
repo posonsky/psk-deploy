@@ -1,0 +1,22 @@
+---
+- block:
+  - name: ensure necessery keyword addition
+    lineinfile:
+      dest: /etc/portage/package.keywords
+      line: '{{ item }}'
+      state: present
+      create: yes
+    with_items: '{{ strings_in_keywords }}'
+
+  - name: ensure NodeJS available
+    portage: package=nodejs state=installed changed_use=yes quiet=yes
+    register: nodejs_installed
+
+  - name: upgrade global libraries
+    script: scripts/npm-upgrade.sh
+    when: nodejs_installed.changed
+
+  - name: ensure Gulp installed globally
+    npm: name=gulp global=yes state=present
+
+  become: yes

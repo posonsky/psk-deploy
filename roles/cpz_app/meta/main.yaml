@@ -3,6 +3,7 @@ dependencies:
   - { role: sqlite, when: 'not quick' }
   - { role: nginx, when: 'not quick' }
   - { role: supervisord, when: 'not quick' }
+  - { role: gulp, when: 'not quick' }
 
 #  - { role: redis, when: 'not quick' }
 #  - { role: rabbitmq, when: 'not quick' }
