@@ -14,16 +14,6 @@
     - 'wheel'
   register: pve_created
 
-- name: clone/pull backend project from git
-  git:
-    repo: '{{ backend_git_remote }}'
-    dest: '{{ backend_project_dir }}'
-    version: '{{ backend_git_branch }}'
-    update: yes
-  tags:
-    - fast
-  register: src_updated
-
 - name: print out git pull result
   debug: var=src_updated verbosity=2
   tags:
@@ -34,7 +24,7 @@
     requirements: '{{ backend_project_dir }}/cpz/requirements/production.txt'
     virtualenv: '{{ project_pve }}'
   register: pve_updated
-  when: src_updated.changed or pve_created
+  when: src_updated.changed or pve_created.changed
   tags:
     - fast
 
@@ -75,7 +65,7 @@
 
 - name: set write permission on Django log for deployment user
   file: path='{{ logs_home }}/django.log' owner='{{ deploy_user }}'
-      group='{{ web_app_group }}' mode=0660 state=file
+      group='{{ web_app_group }}' mode=0660 state=touch
   become: yes
 
 - block:
@@ -94,7 +84,14 @@
   - name: collect backend static
     django_manage: command=collectstatic app_path='{{ backend_project_dir }}'
         settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
-    when: pve_updated.changed
+    when: pve_updated.changed or assets.changed
+    tags:
+      - fast
+
+  - name: compile backend locale messages
+    django_manage: command=compilemessages app_path='{{ backend_project_dir }}'
+        settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
+    when: src_updated.changed
     tags:
       - fast
 

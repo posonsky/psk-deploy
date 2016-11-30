@@ -2,5 +2,23 @@
   include: environment.yaml
   when: 'not quick'
 
-- name: deploy backend project
+- name: clone/pull project sources from git
+  git:
+    repo: '{{ backend_git_remote }}'
+    dest: '{{ backend_project_dir }}'
+    version: '{{ backend_git_branch }}'
+    update: yes
+  register: src_updated
+  tags:
+    - fast
+    - backend
+    - frontend
+
+- name: deploy project's frontend
+  include: frontend.yaml
+  tags: frontend
+
+- name: deploy project's backend
   include: backend.yaml
+  tags: backend
+

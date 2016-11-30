@@ -1,0 +1,7 @@
+- name: install/update Node modules
+  npm: path='{{ backend_project_dir }}/frontend'
+  register: node_modules
+
+- name: generate assets
+  command: /usr/bin/gulp build chdir='{{ backend_project_dir }}/frontend'
+  register: assets
