@@ -1,14 +1,34 @@
 ---
-- name: install CPZ web-application infrastructure
+- name: deploy CPZ web-application infrastructure
   hosts: '{{ target }}'
-  gather_facts: no
+  # gather_facts: no
   vars_files:
     - ../vars/common.yaml
-    - ../vars/cpz.yaml
+
+  pre_tasks:
+    - name: read fstab
+      shell: cat /etc/fstab
+      register: fstab_content
+
+    - name: mount /net partition
+      become: yes
+      mount:
+        fstype: "{{ nfs_fstype|default('nfs4') }}"
+        name: /net
+        src: "{{ nfs_share }}"
+        opts: "{{ nfs_mount_opts }}"
+        state: mounted
+      when: "'/net' in fstab_content.stdout"
 
   roles:
-    - { role: python3, tags: [backend] }
+    - { role: cpz_app, tags: [backend] }
 
-#    - { role: mcms_backend, tags: [backend] }
-#    - { role: mcms_ansible, tags: [ansible] }
-#    - { role: mcms_frontend, tags: [frontend] }
+  post_tasks:
+    - name: read all mounts
+      shell: /bin/mount warn=False
+      register: all_mounts
+
+    - name: unmount /net if need
+      become: yes
+      shell: umount /net warn=False
+      when: "'on /net type' in all_mounts.stdout"

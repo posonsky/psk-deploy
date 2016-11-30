@@ -21,4 +21,3 @@
 - name: deploy project's backend
   include: backend.yaml
   tags: backend
-

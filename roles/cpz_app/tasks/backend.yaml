@@ -35,15 +35,6 @@
         owner={{ web_app_user }} group='{{ web_app_group }}' mode=0444
     register: django_settings
 
-# - name: put uwsgi config
-#   template: src=templates/uwsgi.yaml.j2
-#       dest='{{ backend_project_dir }}/uwsgi.yaml'
-#       owner={{ web_app_user }} group='{{ web_app_group }}' mode=0640
-#   register: uwsgi_config
-
-#- name: put gunicorn config
-#  template: src=templates/uwsgi.yaml.j2
-
   - name: put supervisor's config
     template: src=supervisor-cpositive.conf.j2
         dest=/etc/supervisor/conf.d/cpositive.conf
@@ -61,11 +52,10 @@
         dest=/etc/nginx/sites-enabled/cpositive.conf state=link
     when: vhost_config.changed
 
-  become: yes
+  - name: set write permission on Django log for deployment user
+    file: path='{{ logs_home }}/django.log' owner='{{ deploy_user }}'
+        group='{{ web_app_group }}' mode=0660 state=touch
 
-- name: set write permission on Django log for deployment user
-  file: path='{{ logs_home }}/django.log' owner='{{ deploy_user }}'
-      group='{{ web_app_group }}' mode=0660 state=touch
   become: yes
 
 - block:
