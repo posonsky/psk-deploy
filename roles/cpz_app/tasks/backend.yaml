@@ -8,6 +8,7 @@
 
 - name: create/update PVE for project
   pip: virtualenv='{{ project_pve }}' state=latest name={{ item }}
+    virtualenv_python=/usr/bin/python{{target_python_version}}
   with_items:
     - 'pip'
     - 'setuptools'
@@ -24,7 +25,7 @@
     requirements: '{{ backend_project_dir }}/cpz/requirements/production.txt'
     virtualenv: '{{ project_pve }}'
   register: pve_updated
-  when: src_updated.changed or pve_created.changed
+  when: src_updated.changed or pve_created.changed or force
   tags:
     - fast
 
@@ -42,15 +43,25 @@
     register: superviosor_config
 
   - name: put nginx vhost config
-    template: src=vhost-cpositive.conf.j2
-        dest=/etc/nginx/sites-available/cpositive.conf
+    template: src=vhost-cpositive.ru.j2
+        dest=/etc/nginx/sites-available/cpositive.ru
         owner=root group=root mode=0644
     register: vhost_config
 
   - name: create link in sites-enabled
-    file: src=/etc/nginx/sites-available/cpositive.conf
-        dest=/etc/nginx/sites-enabled/cpositive.conf state=link
-    when: vhost_config.changed
+    file: src=/etc/nginx/sites-available/cpositive.ru
+        dest=/etc/nginx/sites-enabled/cpositive.ru state=link
+    when: vhost_config.changed or force
+
+  - name: check DB file exists
+    stat: path='{{ backend_project_dir }}/db/{{db_name}}.db'
+    register: db_file
+
+  - name: set write permission for deploy user on DB file
+    file: path='{{ backend_project_dir }}/db/{{db_name}}.db'
+      owner='{{ deploy_user }}' group='{{ web_app_group }}'
+      mode=0600 state=touch
+    when: db_file.stat.exists
 
   - name: set write permission on Django log for deployment user
     file: path='{{ logs_home }}/django.log' owner='{{ deploy_user }}'
@@ -62,7 +73,7 @@
   - name: run django migrations
     django_manage: command=migrate app_path='{{ backend_project_dir }}'
         settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
-    when: src_updated.changed
+    when: src_updated.changed or force or not db_file.stat.exists
     tags:
       - fast
 
@@ -74,14 +85,14 @@
   - name: collect backend static
     django_manage: command=collectstatic app_path='{{ backend_project_dir }}'
         settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
-    when: pve_updated.changed or assets.changed
+    when: pve_updated.changed or assets.changed or force
     tags:
       - fast
 
   - name: compile backend locale messages
     django_manage: command=compilemessages app_path='{{ backend_project_dir }}'
         settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
-    when: src_updated.changed
+    when: src_updated.changed or force
     tags:
       - fast
 
@@ -89,6 +100,15 @@
     SECRET_KEY: '{{ django_secret_key }}'
 
 - block:
+  - name: ensure proper rights on DB file
+    file: path='{{ backend_project_dir }}/db/{{db_name}}.db'
+      owner='{{ web_app_user }}' group='{{ web_app_group }}'
+      mode=0600 state=file
+
+  - name: ensure proper rights on logs file
+    file: path='{{ logs_home }}/django.log' owner='{{ web_app_user }}'
+      group='{{ web_app_group }}' mode=0640 state=touch
+
   - name: ensure supervisor's running
     service: name=supervisord state=started enabled=yes
     register: superviosor_running
@@ -97,12 +117,12 @@
     supervisorctl: name='cpz:' state=restarted
     when: src_updated.changed or pve_updated.changed
         or django_settings.changed or uwsgi_config.changed
-        or superviosor_config.changed
+        or superviosor_config.changed or force
     tags:
       - fast
 
   - name: apply vhost settings to nginx instance
     service: name=nginx state=reloaded enabled=yes
-    when: vhost_config.changed
+    when: vhost_config.changed or force
 
   become: yes

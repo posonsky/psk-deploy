@@ -1,7 +1,7 @@
 ---
 - name: deploy CPZ web-application infrastructure
   hosts: '{{ target }}'
-  gather_facts: no
+  # gather_facts: no
   vars_files:
     - ../vars/common.yaml
 

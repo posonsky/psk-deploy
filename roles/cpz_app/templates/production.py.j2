@@ -17,7 +17,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 SECRET_KEY = '{{ django_secret_key }}'
-ALLOWED_HOSTS = ['{{ allowed_hosts }}']
+ALLOWED_HOSTS = {{ allowed_hosts }}
 
 STATIC_ROOT = '{{ backend_static_dir }}'
 

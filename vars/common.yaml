@@ -9,3 +9,5 @@ static_home: /opt/static
 deploy_user: '{{ ansible_remote_user }}'
 
 logs_home: '{{ sites_home }}/logs'
+
+force: false
