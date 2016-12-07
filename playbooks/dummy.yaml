@@ -1,12 +1,11 @@
 - name: Testing playbook
   hosts: '{{ target }}'
-  # gather_facts: no
+  gather_facts: no
   vars_files:
     - ../vars/common.yaml
   vars:
     mega_option: Bla-bla-bla
-    ctx: '{{ mega_option }} - {{ ansible_distribution }}'
-
+    ctx: '{{ mega_option }} - {{ inventory_hostname }}'
 
   tasks:
     - name: Create a file
@@ -14,5 +13,5 @@
       tags: super
 
     - name: Test message
-      debug: msg='System {{ inventory_hostname }} has gateway {{ ansible_default_ipv4.gateway }}'
+      debug: msg='Play as {{ ansible_remote_user }} on {{ inventory_hostname }}'
       tags: dummy
