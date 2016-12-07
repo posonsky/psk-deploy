@@ -32,3 +32,4 @@
       become: yes
       shell: umount /net warn=False
       when: "'on /net type' in all_mounts.stdout"
+      ignore_errors: yes
