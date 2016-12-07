@@ -16,8 +16,12 @@
 
 - name: deploy project's frontend
   include: frontend.yaml
-  tags: frontend
+  tags:
+    - fast
+    - frontend
 
 - name: deploy project's backend
   include: backend.yaml
-  tags: backend
+  tags:
+    - fast
+    - backend

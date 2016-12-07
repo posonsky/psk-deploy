@@ -24,6 +24,7 @@
   pip:
     requirements: '{{ backend_project_dir }}/cpz/requirements/production.txt'
     virtualenv: '{{ project_pve }}'
+    state: latest
   register: pve_updated
   when: src_updated.changed or pve_created.changed or force
   tags:
