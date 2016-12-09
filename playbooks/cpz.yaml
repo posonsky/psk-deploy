@@ -7,9 +7,9 @@
     - ../vars/common.yaml
 
   pre_tasks:
-    - name: read fstab
-      shell: cat /etc/fstab
-      register: fstab_content
+    # - name: read fstab
+    #   shell: cat /etc/fstab
+    #   register: fstab_content
 
     - name: mount /net partition
       become: yes
@@ -19,18 +19,22 @@
         src: "{{ nfs_share }}"
         opts: "{{ nfs_mount_opts }}"
         state: mounted
-      when: "'/net' in fstab_content.stdout"
+      # when: "'/net' in fstab_content.stdout"
+      when:
+        - mount_net_before
 
   roles:
     - { role: cpz_app }
 
   post_tasks:
-    - name: read all mounts
-      shell: /bin/mount warn=False
-      register: all_mounts
+    # - name: read all mounts
+    #   shell: /bin/mount warn=False
+    #   register: all_mounts
 
     - name: unmount /net if need
       become: yes
       shell: umount /net warn=False
-      when: "'on /net type' in all_mounts.stdout"
-      ignore_errors: yes
+      when:
+        - umount_net_after
+      # when: "'on /net type' in all_mounts.stdout"
+      # ignore_errors: yes

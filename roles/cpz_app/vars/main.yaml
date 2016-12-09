@@ -4,3 +4,6 @@ test: false
 
 backend_project: 'cpz'
 target_python_version: '3.4'
+
+pves_home: '{{ prefix }}/pves'
+static_home: '{{ prefix }}/static'

@@ -2,12 +2,13 @@
 nfs_share: "base:/"
 nfs_mount_opts: rw,noauto,noatime,hard,rsize=32768,wsize=32768
 
-sites_home: /opt/sites
-pves_home: /opt/pves
-static_home: /opt/static
+prefix: /opt
+sites_home: '{{ prefix }}/sites'
+logs_home: '{{ sites_home }}/logs'
 
 deploy_user: '{{ ansible_remote_user }}'
 
-logs_home: '{{ sites_home }}/logs'
-
 force: false
+
+mount_net_before: false
+umount_net_after: false
