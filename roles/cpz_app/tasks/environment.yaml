@@ -1,13 +1,5 @@
 ---
 - block:
-  - name: ensure web application group exists
-    group: name={{ web_app_group }} state=present
-
-  - name: ensure web application user exists
-    user: name={{ web_app_user }}
-      comment="Web application owner"
-      group={{ web_app_group }}
-
   - name: ensure PVEs home exits
     file: path='{{ pves_home }}' state=directory
         owner='{{ ansible_remote_user }}' group='{{ web_app_group }}'
@@ -26,5 +18,3 @@
   - name: ensure target directory for static exists
     file: path='{{ backend_static_dir }}' state=directory
         owner='{{ ansible_remote_user }}' group='{{ web_app_group }}'
-
-  become: yes

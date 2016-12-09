@@ -1,5 +1,6 @@
 ---
 quick: false
+test: false
 
 backend_project: 'cpz'
 target_python_version: '3.4'

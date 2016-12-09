@@ -18,6 +18,7 @@ django_settings_path: 'cpz/settings/production.py'
 main_worker_concurrency: 4
 
 project_pve: '{{ pves_home }}/{{ backend_project }}-{{ target_python_version }}'
+requirements_file: cpz/requirements/production.txt
 
 web_app_user: '{{ backend_project }}_runner'
 web_app_group: 'wapp'

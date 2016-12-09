@@ -1,9 +1,3 @@
-- name: setup variables to prevent the fail
-  set_fact:
-    assets: { 'changed': false }
-  tags:
-    - fast
-
 - name: install/update Node modules
   npm: path='{{ backend_project_dir }}/frontend'
   register: node_modules

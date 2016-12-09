@@ -1,6 +1,6 @@
 ---
 dependencies:
   - { role: sqlite, when: 'not quick' }
-  - { role: nginx, when: 'not quick' }
-  - { role: supervisord, when: 'not quick' }
-  - { role: gulp, when: 'not quick' }
+  - { role: nginx, when: 'not quick and not test' }
+  - { role: supervisord, when: 'not quick and not test' }
+  - { role: gulp, when: 'not quick and not test' }

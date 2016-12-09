@@ -1,0 +1,29 @@
+- block:
+  - name: run django migrations
+    django_manage: command=migrate app_path='{{ backend_project_dir }}'
+        settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
+    when: src_updated.changed or force or not db_file.stat.exists
+    tags:
+      - fast
+
+  # - name: load fixtures
+  #   django_manage: command=loaddata app_path='{{ backend_project_dir }}'
+  #       settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
+  #       fixtures='initial'
+
+  - name: collect backend static
+    django_manage: command=collectstatic app_path='{{ backend_project_dir }}'
+        settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
+    when: pve_updated.changed or assets.changed or force
+    tags:
+      - fast
+
+  - name: compile backend locale messages
+    django_manage: command=compilemessages app_path='{{ backend_project_dir }}'
+        settings='{{ django_settings_module }}' virtualenv='{{ project_pve }}'
+    when: src_updated.changed or force
+    tags:
+      - fast
+
+  environment:
+    SECRET_KEY: '{{ django_secret_key }}'

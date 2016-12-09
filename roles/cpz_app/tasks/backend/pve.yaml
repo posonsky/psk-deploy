@@ -1,0 +1,32 @@
+- name: create PVE for project
+  pip:
+    virtualenv: '{{ project_pve }}'
+    name: pip
+    virtualenv_python: python{{target_python_version}}
+  register: pve_created
+  tags:
+    - backend
+
+- name: update base PVE dependencies
+  pip:
+    name: '{{ item }}'
+    executable: '{{ project_pve }}/bin/pip'
+    state: latest
+  with_items:
+    - pip
+    - setuptools
+    - wheel
+  register: pve_updated
+  tags:
+    - backend
+
+- name: setup/update project requirements
+  pip:
+    requirements: '{{ backend_project_dir }}/{{ requirements_file }}'
+    executable: '{{ project_pve }}/bin/pip'
+    state: latest
+  register: pve_updated
+  when: src_updated.changed or pve_updated.changed or force
+  tags:
+    - fast
+    - backend

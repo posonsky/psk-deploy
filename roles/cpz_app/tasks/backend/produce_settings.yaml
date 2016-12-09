@@ -1,0 +1,25 @@
+- block:
+  - name: make production Django settings
+    template: src=production.py.j2
+        dest='{{ backend_project_dir }}/{{ django_settings_path }}'
+        owner={{ web_app_user }} group='{{ web_app_group }}' mode=0444
+    register: django_settings
+
+  - name: put supervisor's config
+    template: src=supervisor-cpositive.conf.j2
+        dest=/etc/supervisor/conf.d/cpositive.conf
+        owner=root group=root mode=0640
+    register: superviosor_config
+
+  - name: put nginx vhost config
+    template: src=vhost-cpositive.ru.j2
+        dest=/etc/nginx/sites-available/cpositive.ru
+        owner=root group=root mode=0644
+    register: vhost_config
+
+  - name: create link in sites-enabled
+    file: src=/etc/nginx/sites-available/cpositive.ru
+        dest=/etc/nginx/sites-enabled/cpositive.ru state=link
+    when: vhost_config.changed or force
+
+  become: yes

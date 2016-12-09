@@ -1,7 +1,32 @@
+- name: set testing values for key variables
+  set_fact:
+    web_app_user: '{{ ansible_user }}'
+    web_app_group: '{{ test_web_app_group }}'
+    requirements_file: cpz/requirements/testing.txt
+  when:
+    - test
+
+- name: setup variables to prevent the fail
+  set_fact:
+    django_settings: { 'changed': false }
+    superviosor_config: { 'changed': false }
+    assets: { 'changed': false }
+  tags:
+    - always
+
+- name: create/check group and user
+  include: group_and_user.yaml
+  when:
+    - not test
+    - not quick
+
 - name: prepare base environment
   include: environment.yaml
-  when: 'not quick'
+  when:
+    - not quick
+  become: '{{ not test }}'
 
+# Clone sources
 - name: clone/pull project sources from git
   git:
     repo: '{{ backend_git_remote }}'
@@ -10,18 +35,44 @@
     update: yes
   register: src_updated
   tags:
-    - fast
-    - backend
-    - frontend
+    - always
 
+- name: print out git pull result
+  debug: var=src_updated verbosity=2
+  tags:
+    - fast
+
+# Frontend
 - name: deploy project's frontend
   include: frontend.yaml
-  tags:
-    - fast
-    - frontend
+  when:
+    - not test
 
-- name: deploy project's backend
-  include: backend.yaml
-  tags:
-    - fast
-    - backend
+# Backend
+- name: create/update PVE with requirements
+  include: backend/pve.yaml
+  when:
+  - not quick
+
+- block:
+  - name: create DB and log files
+    include: backend/db_and_log.yaml
+    when:
+      - not quick
+
+  - name: produce bunch of settings
+    include: backend/produce_settings.yaml
+    when:
+      - not quick
+
+  - name: run some Django commands
+    include: backend/django_commands.yaml
+
+  - name: set privilegies on files
+    include: backend/final_privilegies.yaml
+
+  - name: restart services
+    include: backend/restart.yaml
+
+  when:
+    - not test

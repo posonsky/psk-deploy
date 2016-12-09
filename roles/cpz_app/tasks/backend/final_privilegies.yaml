@@ -1,0 +1,11 @@
+- block:
+  - name: ensure proper rights on DB file
+    file: path='{{ backend_project_dir }}/db/{{db_name}}.db'
+      owner='{{ web_app_user }}' group='{{ web_app_group }}'
+      mode=0600 state=file
+
+  - name: ensure proper rights on logs file
+    file: path='{{ logs_home }}/django.log' owner='{{ web_app_user }}'
+      group='{{ web_app_group }}' mode=0640 state=touch
+
+  become: yes

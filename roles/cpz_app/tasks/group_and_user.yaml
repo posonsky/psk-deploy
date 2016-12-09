@@ -1,0 +1,11 @@
+---
+- block:
+  - name: ensure web application group exists
+    group: name={{ web_app_group }} state=present
+
+  - name: ensure web application user exists
+    user: name={{ web_app_user }}
+      comment="Web application owner"
+      group={{ web_app_group }}
+
+  become: yes

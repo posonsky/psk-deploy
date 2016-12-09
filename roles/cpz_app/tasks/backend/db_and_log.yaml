@@ -1,0 +1,16 @@
+- block:
+  - name: check DB file exists
+    stat: path='{{ backend_project_dir }}/db/{{db_name}}.db'
+    register: db_file
+
+  - name: set write permission for deploy user on DB file
+    file: path='{{ backend_project_dir }}/db/{{db_name}}.db'
+      owner='{{ deploy_user }}' group='{{ web_app_group }}'
+      mode=0600 state=touch
+    when: db_file.stat.exists
+
+  - name: set write permission on Django log for deployment user
+    file: path='{{ logs_home }}/django.log' owner='{{ deploy_user }}'
+        group='{{ web_app_group }}' mode=0660 state=touch
+
+  become: yes

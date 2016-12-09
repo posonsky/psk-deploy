@@ -1,0 +1,17 @@
+- block:
+  - name: ensure supervisor's running
+    service: name=supervisord state=started enabled=yes
+    register: superviosor_running
+
+  - name: restart services
+    supervisorctl: name='cpz:' state=restarted
+    when: src_updated.changed or pve_updated.changed
+        or django_settings.changed or superviosor_config.changed or force
+    tags:
+      - fast
+
+  - name: apply vhost settings to nginx instance
+    service: name=nginx state=reloaded enabled=yes
+    when: vhost_config.changed or force
+
+  become: yes
