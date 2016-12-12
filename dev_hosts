@@ -5,3 +5,7 @@ base
 localhost
 gentoo001
 lh
+
+[linux-kernel]
+base
+localhost
