@@ -47,7 +47,7 @@ server {
     output_buffers 1 128k;
   }
 
-{% if ansible_host == 'base' %}
+{% if cpz_http_hostname == 'cpositive.ru' %}
 
   location /downloads {
     alias /opt/Sites/downloads;
