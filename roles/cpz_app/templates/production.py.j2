@@ -8,7 +8,7 @@ from .base import *  # pylint:disable=wildcard-import,unused-wildcard-import
 
 # Бережёного Бог бережёт!
 DEBUG = False
-# TEMPLATES[0]['OPTIONS']['debug'] = False
+TEMPLATES[0]['OPTIONS']['debug'] = False
 
 EMAIL_HOST = 'localhost'
 ADMINS = (
@@ -23,19 +23,26 @@ STATIC_ROOT = '{{ backend_static_dir }}'
 
 ROOT_URLCONF = 'cpz.urls.production'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': root('db/{{ db_name }}.db'),
-        'USER': '',
-        'PASSWORD': '',
-        # 'PORT': 5433,
-    },
-}
 
-STATICFILES_DIRS += (
-    root('frontend/dist'),
-)
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation'
+        '.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation'
+        '.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation'
+        '.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation'
+        '.NumericPasswordValidator',
+    },
+]
+
 
 LOGGING = {
     'version': 1,
@@ -78,11 +85,6 @@ LOGGING = {
         'django.request': {
             'handlers': ['logfile'],
             'level': 'ERROR',
-            'propagate': True,
-        },
-       'cfg_mgr.tasks': {
-            'handlers': ['logfile'],
-            'level': 'INFO',
             'propagate': True,
         },
         '*': {
