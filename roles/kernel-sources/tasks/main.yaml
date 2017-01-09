@@ -1,0 +1,5 @@
+- name: fetch sources from git and switch to target version
+  git:
+    repo: git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+    dest: /opt/src/linux-stable
+    version: 'v{{ kernel_target_version }}'

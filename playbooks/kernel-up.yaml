@@ -1,108 +1,37 @@
 ---
+
+# - name: fetch kernel sources from git
+#   hosts: base
+#   vars_files:
+#     - ../vars/common.yaml
+#   tasks:
+#   - name: switch to target version
+#     hosts: base
+#     git:
+#       repo: git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+#       dest: /opt/src/linux-stable
+#       # update: no
+#       version: 'v{{ kernel_target_version }}'
+#     # delegate_to: base
+
+# - name: update Linux kernel
+#   hosts: linux-kernel
+#   # strategy: debug
+#   vars_files:
+#     - ../vars/common.yaml
+
+
+#   tasks:
+
+- name: fetch kernel sources from git
+  hosts: base
+  roles:
+  - kernel-sources
+
 - name: update Linux kernel
   hosts: linux-kernel
-  # strategy: debug
-  vars_files:
-    - ../vars/common.yaml
   vars:
     cpus: '{{ ansible_processor_vcpus + 1 | int }}'
     grub: 1
-
-  tasks:
-  - name: define grub version
-    command: /usr/bin/qlist -Iv grub
-    register: find_grub
-
-  - name: set target grub version to 2
-    set_fact:
-      grub: 2
-    when: "'grub-2' in find_grub.stdout"
-
-  - name: fetch kernel sources from git
-    git:
-      repo: git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
-      dest: /opt/src/linux-stable
-      version: 'v{{ kernel_target_version }}'
-    delegate_to: base
-    ignore_errors: yes
-    when: false
-
-  - name: prepare and build kernel
-    command: /usr/bin/make O=/usr/src/linux-stable/ -sj{{ cpus }} {{ item }}
-      chdir={{ sources_path }}
-    with_items:
-      - clean
-      - oldconfig
-      - bzImage
-      - modules
-    when: false
-
-  - block:
-    - name: mount /boot
-      mount:
-        name: /boot
-        src: '{{ boot_partition }}'
-        fstype: ext2
-        state: mounted
-
-    - name: install kernel image, modules and firmware
-      command: /usr/bin/make O=/usr/src/linux-stable/ -sj{{ cpus }} {{ item }}
-        chdir={{ sources_path }}
-      with_items:
-        - install
-        - modules_install
-        - firmware_install
-
-    # - name: make install
-    #   make:
-    #     chdir: '{{ sources_path }}'
-    #     target: install
-    #     params:
-    #       O: /usr/src/linux-stable/
-
-    - name: dracut
-      command: /usr/bin/dracut -H -f --kver {{ kernel_target_version }}
-
-    - name: find old modules
-      find:
-        path: /lib/modules/
-        file_type: directory
-        patterns: ^((?!{{ kernel_target_version }}|{{ ansible_kernel }}).)*$
-        use_regex: yes
-      register: old_modules_dirs
-
-    - name: remove old modules
-      file: name={{ item.path }} state=absent
-      with_items: '{{ old_modules_dirs.files }}'
-
-    - name: find old images and so on
-      find:
-        path: /boot
-        file_type: file
-        patterns: ^((?!{{ kernel_target_version }}|{{ ansible_kernel }}).)*$|^.*old$
-        use_regex: yes
-      register: old_images
-
-    - name: remove old images
-      file: name={{ item.path }} state=absent
-      with_items: '{{ old_images.files }}'
-
-    - name: update grub menu with grub 1
-      replace:
-        dest: /boot/grub/grub.conf
-        regexp: (vmlinuz|initramfs)-{{ ansible_kernel }}
-        replace: \1-{{ kernel_target_version }}
-      when: grub == 1
-
-    - name: update grub menu with grub 2
-      command: /usr/sbin/grub-mkconfig -o /boot/grub/grub.cfg
-      when: grub == 2
-
-    - name: unmount /boot
-      mount:
-        name: /boot
-        src: '{{ boot_partition }}'
-        state: unmounted
-
-    become: yes
-    # when: false
+  roles:
+  - kernel-update
