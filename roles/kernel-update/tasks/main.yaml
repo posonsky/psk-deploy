@@ -7,17 +7,6 @@
     grub: 2
   when: "'grub-2' in find_grub.stdout"
 
-# - name: fetch kernel sources from git
-#   git:
-#     repo: git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
-#     dest: /opt/src/linux-stable
-#     update: yes
-#     force: yes
-#   delegate_to: base
-
-# ignore_errors: yes
-# when: false
-
 - name: prepare and build kernel
   command: /usr/bin/make O=/usr/src/linux-stable/ -sj{{ cpus }} {{ item }}
     chdir={{ sources_path }}
@@ -43,13 +32,6 @@
       - install
       - modules_install
       - firmware_install
-
-# - name: make install
-#   make:
-#     chdir: '{{ sources_path }}'
-#     target: install
-#     params:
-#       O: /usr/src/linux-stable/
 
   - name: dracut
     command: /usr/bin/dracut -H -f --kver {{ kernel_target_version }}

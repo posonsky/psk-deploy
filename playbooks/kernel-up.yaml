@@ -1,28 +1,4 @@
 ---
-
-# - name: fetch kernel sources from git
-#   hosts: base
-#   vars_files:
-#     - ../vars/common.yaml
-#   tasks:
-#   - name: switch to target version
-#     hosts: base
-#     git:
-#       repo: git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
-#       dest: /opt/src/linux-stable
-#       # update: no
-#       version: 'v{{ kernel_target_version }}'
-#     # delegate_to: base
-
-# - name: update Linux kernel
-#   hosts: linux-kernel
-#   # strategy: debug
-#   vars_files:
-#     - ../vars/common.yaml
-
-
-#   tasks:
-
 - name: fetch kernel sources from git
   hosts: base
   roles:
