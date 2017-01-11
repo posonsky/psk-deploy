@@ -1,0 +1,2 @@
+*.yaml linguist-language=YAML
+*.j2 linguist-language=Jinja2
