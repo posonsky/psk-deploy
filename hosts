@@ -1,5 +1,9 @@
 [cpz]
 base
 
+[linux-kernel]
+base
+localhost
+
 [test]
 localhost

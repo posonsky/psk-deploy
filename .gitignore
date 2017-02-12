@@ -9,4 +9,6 @@ keys/*
 log/*
 #vars/*
 
-!*/.gitkeep
+hosts
+
+!.gitkeep
