@@ -1,6 +1,8 @@
 ---
 gentoo_packages:
-  - 'www-apps/cgit-{{ target_cgit_version }}'
+  - '=www-apps/cgit-{{ target_cgit_version }}'
   - dev-python/markdown
   - dev-python/docutils
   - dev-vcs/git
+
+pygments_style: friendly

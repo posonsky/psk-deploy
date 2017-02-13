@@ -38,19 +38,33 @@
     template: src=nginx.vhost.j2
       dest=/etc/nginx/sites-available/{{ git_host_name }}
       owner=root group=nginx mode=0640
-    register: nginx_vhost_available
+    register: nginx_vhost_config
 
   - name: ensure nginx vhost config enabled
     file: path=/etc/nginx/sites-enabled/{{ git_host_name }} state=link
       src=/etc/nginx/sites-available/{{ git_host_name }}
     register: nginx_vhost_enabled
-    when: nginx_vhost_available.changed
+    when: nginx_vhost_config.changed
 
-  #- name: ensure cgit user in right group (to read repos)
-  #  user: name=cgit groups='{{ git_repos_group }}' append=yes
+  - name: switch highlighting style
+    replace:
+      dest: /usr/lib/cgit/filters/syntax-highlighting.py
+      regexp: ^(formatter\s+=\s+HtmlFormatter\(style=\')[A-Za-z_0-9]+(\'\))$
+      replace: '\1{{ pygments_style }}\2'
 
   become: yes
 
 # Vhost directory
 - name: prepare nginx vhost directory
   include: vhost.yaml
+
+- block:
+  - name: ensure uswgi.cgit service is running
+    service: name=uwsgi.cgit state=restarted enabled=yes
+    register: uwsgi_restarted
+
+  - name: reload nginx if necessary
+    service: name=nginx state=reloaded enabled=yes
+    when: nginx_vhost_config.changed or force
+
+  become: yes
