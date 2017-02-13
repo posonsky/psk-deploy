@@ -2,4 +2,4 @@
 cgit_user: cgit
 cgit_group: nginx
 
-uwsgi_socket_path: /run/uwsgi/cgit.sock
+uwsgi_socket_path: /tmp/cgit.sock
