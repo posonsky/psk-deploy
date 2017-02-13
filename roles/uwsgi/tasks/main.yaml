@@ -7,6 +7,12 @@
       state: present
       create: yes
 
+  - name: clean `UWSGI_PLUGINS` from make.conf
+    replace:
+      dest: /etc/portage/make.conf
+      regexp: UWSGI_PLUGINS=\".*\n.*\"$
+      replace: ''
+
   - name: ensure proper `UWSGI_PLUGINS` in make.conf
     lineinfile:
       dest: /etc/portage/make.conf
