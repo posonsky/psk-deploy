@@ -1,0 +1,13 @@
+<uwsgi>
+  <master/>
+  <plugin>cgi</plugin>
+  <socket>{{ uwsgi_socket_path }}</socket>
+  <chmod-socket>664</chmod-socket>
+  <uid>cgit</uid>
+  <gid>nginx</gid>
+  <procname-master>uwsgi-cgit</procname-master>
+  <processes>1</processes>
+  <threads>2</threads>
+  <cgi>/usr/share/webapps/cgit/{{ target_cgit_version }}/hostroot/cgi-bin/cgit.cgi</cgi>
+  <!-- <workers>3</workers> -->
+</uwsgi>

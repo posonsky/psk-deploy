@@ -1,0 +1,29 @@
+---
+- name: deploy cgit web-interface
+  hosts: cgit
+  # strategy: debug
+  gather_facts: no
+  vars_files:
+    - ../vars/common.yaml
+
+  pre_tasks:
+    - name: mount /net partition
+      become: yes
+      mount:
+        fstype: "{{ nfs_fstype|default('nfs4') }}"
+        name: /net
+        src: "{{ nfs_share }}"
+        opts: "{{ nfs_mount_opts }}"
+        state: mounted
+      when:
+        - mount_net_before
+
+  roles:
+    - { role: cgit }
+
+  post_tasks:
+    - name: unmount /net if need
+      become: yes
+      shell: umount /net warn=False
+      when:
+        - umount_net_after

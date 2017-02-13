@@ -1,0 +1,24 @@
+---
+- block:
+  - name: ensure vhost directory exists
+    file: path=/var/www/{{ git_host_name }}
+      owner=root group=root mode=0644 state=directory
+
+  - name: ensure link to original installed cgit exists
+    file: path=/var/www/{{ git_host_name }}/cgit
+      state=link src=/usr/share/webapps/cgit/{{ target_cgit_version }}
+
+  - name: ensure `htdocs` directory presents
+    file: path=/var/www/{{ git_host_name }}/htdocs
+      owner=root group=root mode=0644 state=directory
+
+  - name: ensure links to styles etc. exist
+    file: path=/var/www/{{ git_host_name }}/htdocs/{{ item }}
+      state=link src=../cgit/htdocs/{{ item }}
+    with_items:
+      - cgit.css
+      - cgit.png
+      - favicon.ico
+      - robots.txt
+
+  become: yes

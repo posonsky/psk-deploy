@@ -1,0 +1,30 @@
+server {
+  listen 80;
+  server_name {{ git_host_name }};
+
+  root /var/www/{{ git_host_name }}/cgit;
+
+  # Serve static files with nginx
+  location ~* ^.+(cgit.(css|png)|favicon.ico|robots.txt) {
+    root /var/www/{{ git_host_name }}/htdocs;
+    expires 30d;
+  }
+
+  location / {
+    satisfy any;
+    allow {{ private_net_addr }};
+    deny all;
+
+    try_files $uri @cgit;
+  }
+
+  location @cgit {
+    gzip off;
+    include uwsgi_params;
+    uwsgi_modifier1 9;
+    uwsgi_pass unix:{{ uwsgi_socket_path }};
+  }
+
+  access_log /var/log/nginx/{{ git_host_name }}.access_log main;
+  error_log /var/log/nginx/{{ git_host_name }}.error_log info;
+}

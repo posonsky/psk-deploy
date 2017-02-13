@@ -1,0 +1,56 @@
+---
+- block:
+  - name: ensure `dev-python/pygments` in package.keywords
+    lineinfile:
+      dest: /etc/portage/package.keywords
+      line: dev-python/pygments
+      state: present
+      create: yes
+
+  - name: ensure bundle of packages installed
+    portage: package={{ item }} state=installed changed_use=yes quiet=yes
+    with_items: '{{ gentoo_packages }}'
+
+  - name: ensure `cgitrc` is up to date
+    template: src=cgitrc.j2 dest=/etc/cgitrc
+      owner=root group=cgit mode=0640
+    register: cgitrc
+
+  - name: ensure `cgit-repos` is up to date
+    template: src=cgit-repos.j2 dest=/etc/cgit-repos
+      owner=root group=cgit mode=0640
+    register: cgit_repos
+
+  - name: ensure uwsgi cgit XML config is up to date
+    template: src=cgit.xml.j2 dest=/etc/uwsgi.d/cgit.xml
+      owner=root group=cgit mode=0640
+    register: cgit_xml
+
+  - name: ensure `/etc/conf.d/uwsgi.cgit` is up to date
+    template: src=uwsgi.cgit.j2 dest=/etc/conf.d/uwsgi.cgit
+      owner=root group=root mode=0644
+    register: confd_uwsgi_cgit
+
+  - name: ensure uwsgi.cgit service link exists
+    file: path=/etc/init.d/uwsgi.cgit state=link src=/etc/init.d/uwsgi
+
+  - name: ensure nginx vhost config is up to date
+    template: src=nginx.vhost.j2
+      dest=/etc/nginx/sites-available/{{ git_host_name }}
+      owner=root group=nginx mode=0640
+    register: nginx_vhost_available
+
+  - name: ensure nginx vhost config enabled
+    file: path=/etc/nginx/sites-enabled/{{ git_host_name }} state=link
+      src=/etc/nginx/sites-available/{{ git_host_name }}
+    register: nginx_vhost_enabled
+    when: nginx_vhost_available.changed
+
+  #- name: ensure cgit user in right group (to read repos)
+  #  user: name=cgit groups='{{ git_repos_group }}' append=yes
+
+  become: yes
+
+# Vhost directory
+- name: prepare nginx vhost directory
+  include: vhost.yaml

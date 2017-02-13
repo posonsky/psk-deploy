@@ -9,3 +9,6 @@ lh
 [linux-kernel]
 base
 localhost
+
+[cgit]
+base

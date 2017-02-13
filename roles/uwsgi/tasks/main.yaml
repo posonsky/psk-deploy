@@ -1,0 +1,22 @@
+---
+- block:
+  - name: ensure `cgi` in uwsgi USE variables
+    lineinfile:
+      dest: /etc/portage/package.use/uwsgi
+      line: www-servers/uwsgi  cgi
+      state: present
+      create: yes
+
+  - name: ensure proper `UWSGI_PLUGINS` in make.conf
+    lineinfile:
+      dest: /etc/portage/make.conf
+      line: |
+        UWSGI_PLUGINS="cache carbon cheaper_busyness corerouter fastrouter \
+        http logfile logsocket signal spooler symcall syslog"
+      state: present
+      create: yes
+
+  - name: ensure uwsgi package installed
+    portage: package=www-servers/uwsgi state=installed changed_use=yes quiet=yes
+
+  become: yes
