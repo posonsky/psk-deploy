@@ -18,7 +18,18 @@
     with_items:
       - cgit.css
       - cgit.png
-      - favicon.ico
       - robots.txt
+      # - favicon.ico
+
+  - name: place logo icon to `htdocs` directory
+    copy:
+      src: '{{ item }}'
+      dest: '/var/www/{{ git_host_name }}/htdocs/{{ item }}'
+      owner: root
+      group: root
+      mode: 0644
+    with_items:
+      - cgit-logo-96.png
+      - favicon.ico
 
   become: yes
