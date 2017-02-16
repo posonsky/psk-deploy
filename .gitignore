@@ -13,4 +13,5 @@ log/*
 
 !.gitkeep
 
+/.vscode/*
 /tags
