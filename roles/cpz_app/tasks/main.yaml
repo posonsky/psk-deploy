@@ -57,8 +57,6 @@
 - block:
   - name: create DB and log files
     include: backend/db_and_log.yaml
-    when:
-      - not quick
 
   - name: produce bunch of settings
     include: backend/produce_settings.yaml
