@@ -1,6 +1,6 @@
 ---
 - name: deploy CPZ web-application infrastructure
-  hosts: '{{ target }}'
+  hosts: cpz
   # strategy: debug
   gather_facts: no
   vars_files:
