@@ -9,6 +9,7 @@ cpz_backend_socket: /tmp/cpz_backend.sock
 
 cpz_http_hostname: cpositive.ru
 cpz_http_port: 80
+cpz_http_ssl_port: 443
 
 db_name: cpz
 
