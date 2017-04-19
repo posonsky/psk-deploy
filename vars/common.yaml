@@ -13,5 +13,6 @@ force: false
 mount_net_before: false
 umount_net_after: false
 
+pves_home: '{{ prefix }}/pves'
+
 target_cgit_version: 0.12
- 
