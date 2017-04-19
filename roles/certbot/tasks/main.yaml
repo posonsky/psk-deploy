@@ -1,0 +1,18 @@
+---
+- name: setup python virtual environment for certbot
+  pip:
+    name: certbot
+    virtualenv: '{{ certbot_pve }}'
+    virtualenv_python: python{{target_python_version}}
+  register: pve_created
+
+- block:
+  - name: ensure certbot will run twice a day
+    cron:
+      name: certbot timetable
+      minute: 17
+      hour: '*/12'
+      user: root
+      job: '{{ certbot_pve }}/bin/certbot renew --quiet'
+
+  become: yes

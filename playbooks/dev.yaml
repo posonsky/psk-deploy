@@ -1,0 +1,10 @@
+---
+- name: deploy Certbot and Varnish
+  hosts: web-servers
+  # strategy: debug
+  gather_facts: no
+  vars_files:
+    - ../vars/common.yaml
+
+  roles:
+    - { role: certbot }
