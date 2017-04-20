@@ -1,0 +1,8 @@
+---
+- name: restart varnishd
+  become: yes
+  service: name=varnishd state=restarted enabled=yes
+
+- name: reload varnishd
+  become: yes
+  service: name=varnishd state=reloaded enabled=yes

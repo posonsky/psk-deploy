@@ -1,0 +1,6 @@
+---
+varnish_proxy_port: 8090
+varnish_control_port: 6082
+varnish_storage: 'malloc,64m'
+varnish_config_dir: /etc/varnish
+varnish_secret_file: '{{ varnish_config_dir }}/secret'

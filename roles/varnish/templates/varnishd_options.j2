@@ -1,0 +1,16 @@
+# /etc/conf.d/varnishd
+
+VARNISHD="/usr/sbin/varnishd"
+VARNISHADM="/usr/bin/varnishadm"
+
+CONFIGFILE="/etc/varnish/default.vcl"
+
+VARNISHD_OPTS="-a 127.0.0.1:{{ varnish_proxy_port }} \
+  -T ::1::{{ varnish_control_port }} \
+  -s {{ varnish_storage }} \
+  -S {{ varnish_secret_file }}"
+
+# You may need to increase the number of open files (-n)
+# and the maximum amount off locked memory (-l)
+# See bug #459142
+#rc_ulimit="-n 32786 -l 82000"

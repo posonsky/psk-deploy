@@ -1,5 +1,7 @@
 ---
-nfs_share: "base:/"
+package_keywords_dir: /etc/portage/package.keywords
+
+nfs_share: 'base:/'
 nfs_mount_opts: rw,noauto,noatime,hard,rsize=32768,wsize=32768
 
 prefix: /opt
