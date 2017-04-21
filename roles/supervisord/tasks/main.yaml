@@ -1,13 +1,14 @@
 ---
 - block:
   - name: ensure supervisor in package.keywords
-    lineinfile:
-      dest: /etc/portage/package.keywords
-      line: app-admin/supervisor
-      create: yes
+    template: src=supervisor.keywords.j2
+      dest='{{ package_keywords_dir }}/supervisor'
+      owner=root group=root mode=0644
+    register: supervisor_in_keywords
 
   - name: install supervisor package
-    portage: package=app-admin/supervisor state=present update=yes quiet=yes
+    portage: package=app-admin/supervisor state=present update=yes
+      newuse=yes quiet=yes
     register: supervisor_installed
 
   - name: create directory for projects settings controls by supervisor

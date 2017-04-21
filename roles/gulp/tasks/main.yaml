@@ -1,12 +1,10 @@
 ---
 - block:
   - name: ensure necessery keyword addition
-    lineinfile:
-      dest: /etc/portage/package.keywords
-      line: '{{ item }}'
-      state: present
-      create: yes
-    with_items: '{{ strings_in_keywords }}'
+    template: src=nodejs.keywords.j2
+        dest='{{ package_keywords_dir }}/nodejs'
+        owner=root group=root mode=0644
+    register: nodejs_in_keywords
 
   - name: ensure NodeJS available
     portage: package=nodejs state=installed changed_use=yes quiet=yes

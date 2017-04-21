@@ -1,13 +1,13 @@
 ---
 - block:
   - name: ensure nginx in package.keywords
-    lineinfile:
-      dest: /etc/portage/package.keywords
-      line: www-servers/nginx
-      create: yes
+    template: src=nginx.keywords.j2
+      dest='{{ package_keywords_dir }}/nginx'
+      owner=root group=root mode=0644
+    register: nginx_in_keywords
 
   - name: ensure nginx package installed
-    portage: package=nginx state=present update=yes quiet=yes
+    portage: package=nginx state=present update=yes newuse=yes quiet=yes
     register: nginx_installed
 
   - name: create directory structure for vitual hosts
@@ -29,7 +29,10 @@
 
   - name: make nginx main configuration file
     template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf
-    when: nginx_installed.changed
+    notify: restart nginx
+
+  - name: ensure ssl configuration snippet in place
+    template: src=snippet-ssl.conf.j2 dest=/etc/nginx/snippet-ssl.conf
     notify: restart nginx
 
   - name: ensure nginx running
