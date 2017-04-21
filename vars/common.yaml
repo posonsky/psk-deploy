@@ -17,4 +17,6 @@ umount_net_after: false
 
 pves_home: '{{ prefix }}/pves'
 
+varnish_proxy_port: 8090
+
 target_cgit_version: 0.12

@@ -1,12 +1,12 @@
 - block:
   - name: ensure varnish in package.keywords
-    template: src=varnish.j2
+    template: src=varnish.keywords.j2
         dest='{{ package_keywords_dir }}/varnish'
         owner=root group=root mode=0644
     register: varnish_in_keywords
 
   - name: ensure varnish package installed
-    portage: package=varnish state=present update=yes quiet=yes
+    portage: package=varnish state=present update=yes newuse=yes quiet=yes
     register: varnish_installed
 
   - name: check varnish secret file exists

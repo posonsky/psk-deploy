@@ -16,8 +16,8 @@
       mount:
         fstype: "{{ nfs_fstype|default('nfs4') }}"
         name: /net
-        src: "{{ nfs_share }}"
-        opts: "{{ nfs_mount_opts }}"
+        src: '{{ nfs_share }}'
+        opts: '{{ nfs_mount_opts }}'
         state: mounted
       # when: "'/net' in fstab_content.stdout"
       when:

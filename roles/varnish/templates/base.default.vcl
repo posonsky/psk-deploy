@@ -2,8 +2,13 @@ vcl 4.0;
 
 # Default backend definition. Set this to point to your content server.
 backend cpz {
-  .host = "127.0.0.1";
+  .host = "[::1]";
   .port = "8000";
+}
+
+backend static {
+  .host = "[::1]";
+  .port = "80";
 }
 
 acl local {
@@ -13,7 +18,12 @@ acl local {
 sub vcl_recv {
   # Happens before we check if we have this in cache already.
   if (req.url ~ "/static/") {
+    set req.backend_hint = static;
+
     unset req.http.Cookie;
+
+  } else {
+    set req.backend_hint = default;
   }
 
   if (req.method == "PURGE") {

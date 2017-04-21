@@ -1,6 +1,7 @@
 [program:cpz_gunicorn]
 command={{ project_pve }}/bin/gunicorn cpz.wsgi:application
-  -b unix://{{ cpz_backend_socket }}
+  -b [::1]:8000
+#  -b unix://{{ cpz_backend_socket }}
 
 environment=
   DJANGO_SETTINGS_MODULE="{{ django_settings_module }}",

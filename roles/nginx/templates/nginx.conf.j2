@@ -3,7 +3,7 @@ worker_processes 1;
 
 pcre_jit on;
 
-error_log /var/log/nginx/error_log notice;
+error_log /var/log/nginx/error_log warn;
 
 events {
 	worker_connections 1024;
@@ -46,7 +46,7 @@ http {
 
 	open_log_file_cache max=1000 inactive=20s valid=1h min_uses=2;
 
-	proxy_cache_path {{ nginx_home }}/cache levels=1:2 keys_zone=one:300m;
+	# proxy_cache_path {{ nginx_home }}/cache levels=1:2 keys_zone=one:300m;
 	# client_body_temp_path   {{ nginx_home }}/client_temp 1 2;
 	# proxy_temp_path         {{ nginx_home }}/proxy_temp 1 2;
 	# fastcgi_temp_path       {{ nginx_home }}/fastcgi_temp 1 2;
