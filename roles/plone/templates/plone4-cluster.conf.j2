@@ -1,0 +1,45 @@
+[program:zeoserver4]
+command = /opt/Sites/cpositive/bin/zeoserver start
+environment = SUPERVISOR_ENABLED=1
+directory = /opt/Sites/cpositive/
+autostart = true
+autorestart = true
+redirect_stderr = true
+stdout_logfile = /opt/Sites/cpositive/var/supervisor-%(program_name)s.log
+stderr_logfile = /opt/Sites/cpositive/var/supervisor-%(program_name)s-stderr.log
+startsecs = 10
+priority = 100
+user = {{ web_app_user }}
+
+
+[program:bp4]
+command = /opt/Sites/cpositive/bin/client_bp console
+directory = /opt/Sites/cpositive/
+autostart = true
+autorestart = true
+redirect_stderr = true
+stdout_logfile = /opt/Sites/cpositive/var/supervisor-%(program_name)s.log
+stderr_logfile = /opt/Sites/cpositive/var/supervisor-%(program_name)s-stderr.log
+startsecs = 20
+priority = 200
+user = {{ web_app_user }}
+
+
+[program:ep4]
+command=/opt/Sites/cpositive/bin/client_ep console
+directory = /opt/Sites/cpositive/
+autostart = true
+autorestart = true
+redirect_stderr = true
+stdout_logfile = /opt/Sites/cpositive/var/supervisor-%(program_name)s.log
+stderr_logfile = /opt/Sites/cpositive/var/supervisor-%(program_name)s-stderr.log
+startsecs = 20
+priority = 200
+user = {{ web_app_user }}
+
+
+[group:plone4]
+programs = zeoserver4, bp4, ep4
+startretries = 2
+environment = SUPERVISOR_ENABLED=1
+user = {{ web_app_user }}

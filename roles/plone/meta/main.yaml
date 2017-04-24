@@ -1,0 +1,6 @@
+---
+dependencies:
+  - { role: varnish, when: 'not quick and not test' }
+  - { role: certbot, when: 'not quick and not test' }
+  - { role: nginx, when: 'not quick and not test' }
+  - { role: supervisord, when: 'not quick and not test' }

@@ -23,7 +23,7 @@ sub vcl_recv {
     unset req.http.Cookie;
 
   } else {
-    set req.backend_hint = default;
+    set req.backend_hint = cpz;
   }
 
   if (req.method == "PURGE") {

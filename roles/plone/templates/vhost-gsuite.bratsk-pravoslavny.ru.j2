@@ -1,0 +1,17 @@
+server {
+  listen 80;
+  server_name www.gsuite.bratsk-pravoslavny.ru;
+  return 301 scheme://gsuite.bratsk-pravoslavny.ru$request_uri;
+}
+
+server {
+  listen 80;
+  server_name gsuite.bratsk-pravoslavny.ru;
+
+  access_log  /var/log/nginx/gsuite.bratsk-pravoslavny.ru.access_log main;
+  error_log  /var/log/nginx/gsuite.bratsk-pravoslavny.ru.error_log warn;
+
+  root /var/www/gsuite.bratsk-pravoslavny.ru/htdocs;
+
+  location / {}
+}

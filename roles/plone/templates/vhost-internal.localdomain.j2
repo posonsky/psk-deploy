@@ -1,0 +1,30 @@
+# Varnish cache
+upstream varnish {
+  server [::1]:{{ varnish_proxy_port }} fail_timeout=0;
+}
+
+# Static server
+server {
+  listen [::1]:80;
+  server_name internal.localdomain default_server;
+
+  root /var/www/localhost/htdocs;
+
+  access_log /var/log/nginx/internal.access_log main;
+  error_log /var/log/nginx/internal.error_log warn;
+
+  location /wf/ {
+    alias /var/www/bratsk-pravoslavny.ru/htdocs/wf/;
+    aio on;
+    directio 512;
+    output_buffers 8 256k;
+
+    sendfile on;
+    sendfile_max_chunk 1m;
+    tcp_nopush on;
+    tcp_nodelay on;
+
+    expires 30d;
+    access_log off;
+  }
+}

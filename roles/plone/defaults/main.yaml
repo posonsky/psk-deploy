@@ -1,0 +1,16 @@
+---
+public_http_port: 80
+public_http_ssl_port: 443
+
+bp_public_hostname: bratsk-pravoslavny.ru
+ep_public_hostname: eganovo-pokrova.ru
+
+working_sites:
+  - internal.localdomain
+  - '{{ bp_public_hostname }}'
+  - '{{ ep_public_hostname }}'
+  - miloserdie-bratska.rf
+  - gsuite.bratsk-pravoslavny.ru
+
+web_app_user: ploner
+web_app_group: zope

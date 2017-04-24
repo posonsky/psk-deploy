@@ -1,0 +1,32 @@
+---
+- name: setup variables to prevent the fail
+  set_fact:
+    superviosor_config: { 'changed': false }
+  tags:
+    - always
+
+- block:
+  - name: put supervisor's config
+    template: src=plone4-cluster.conf.j2
+        dest=/etc/supervisor/conf.d/plone4-cluster.conf
+        owner=root group=root mode=0640
+    register: superviosor_config
+    notify: restart supervisord
+
+  - name: put nginx vhost configs
+    template: src=vhost-{{ item }}.j2
+        dest=/etc/nginx/sites-available/{{ item }}
+        owner=root group=root mode=0644
+    with_items:
+      - '{{ working_sites }}'
+    register: vhost_configs
+
+  - name: create links in sites-enabled
+    file: src=/etc/nginx/sites-available/{{ item }}
+        dest=/etc/nginx/sites-enabled/{{ item }} state=link
+    with_items:
+      - '{{ working_sites }}'
+    when: vhost_configs.changed or force
+    notify: restart nginx
+
+  become: yes

@@ -1,0 +1,19 @@
+server {
+  listen 80;
+  server_name www.xn----8sbacnfbvcydk2a3afijr.xn--p1ai;
+  return 301 scheme://xn----8sbacnfbvcydk2a3afijr.xn--p1ai$request_uri;
+}
+
+server {
+  listen 80;
+  server_name xn----8sbacnfbvcydk2a3afijr.xn--p1ai;
+
+  # client_max_body_size 1500k;
+
+  access_log /var/log/nginx/miloserdie-bratska.rf.access_log main;
+  error_log /var/log/nginx/miloserdie-bratska.rf.error_log warn;
+
+  root /var/www/miloserdie-bratska.rf/htdocs;
+
+  location / {}
+}
