@@ -1,9 +1,9 @@
 ---
 - name: setup python virtual environment for certbot
   pip:
-    name: certbot
+    name: certbot-nginx
     virtualenv: '{{ certbot_pve }}'
-    virtualenv_python: python{{target_python_version}}
+    virtualenv_python: python{{certbot_python_version}}
   register: pve_created
 
 - block:
@@ -13,6 +13,7 @@
       minute: 17
       hour: '*/12'
       user: root
-      job: '{{ certbot_pve }}/bin/certbot renew --quiet'
+      job: '{{ certbot_pve }}/bin/certbot renew --nginx --preferred-challenges
+        tls-sni --quiet'
 
   become: yes
